@@ -26,8 +26,10 @@ import Profile from "@/pages/dashboard/profile";
 function Router() {
   return (
     <Switch>
-      {/* Public Routes */}
-      <Route path="/auth" component={AuthPage} />
+      {/* Public Routes - Auth must come before any dynamic username routes */}
+      <Route path="/auth">
+        <AuthPage />
+      </Route>
       
       {/* Protected Dashboard Routes */}
       <ProtectedRoute path="/" component={Dashboard} />
@@ -40,7 +42,7 @@ function Router() {
       <ProtectedRoute path="/dashboard/theme" component={ThemeSettings} />
       <ProtectedRoute path="/dashboard/profile" component={Profile} />
       
-      {/* Public Portfolio Routes - keep these after dashboard routes to prevent conflicts */}
+      {/* Public Portfolio Routes - keep these after dashboard routes and auth to prevent conflicts */}
       <Route path="/:username/:slug" component={CaseStudyView} />
       <Route path="/:username" component={PublicPortfolio} />
       
