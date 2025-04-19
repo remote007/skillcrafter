@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-slate-50 text-slate-800;
+    font-family: 'Inter', sans-serif;
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --primary: 246 80% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 246 80% 60%;
+    --radius: 0.5rem;
+    --sidebar-background: 222.2 47.4% 11.2%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 246 80% 60%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 25 95% 53%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 246 80% 60%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 246 80% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 210 40% 98%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 246 80% 60%;
+  }
+}
+
+/* Theme Specific Styles */
+.theme-minimal {
+  --theme-primary: #4F46E5;
+  --theme-secondary: #0EA5E9;
+  --theme-accent: #F97316;
+  --theme-background: #F8FAFC;
+  --theme-text: #334155;
+  --theme-card-background: #FFFFFF;
+  --theme-header-background: #FFFFFF;
+  --theme-border-radius: 0.5rem;
+}
+
+.theme-bold {
+  --theme-primary: #6D28D9;
+  --theme-secondary: #4F46E5;
+  --theme-accent: #EC4899;
+  --theme-background: #0F172A;
+  --theme-text: #F8FAFC;
+  --theme-card-background: #1E293B;
+  --theme-header-background: #0F172A;
+  --theme-border-radius: 0.25rem;
+}
+
+.theme-bold .portfolio-card {
+  transition: transform 0.3s ease;
+}
+
+.theme-bold .portfolio-card:hover {
+  transform: translateY(-5px);
+}
+
+.theme-classic {
+  --theme-primary: #10B981;
+  --theme-secondary: #064E3B;
+  --theme-accent: #F59E0B;
+  --theme-background: #FAFAF9;
+  --theme-text: #1C1917;
+  --theme-card-background: #FFFFFF;
+  --theme-header-background: #FFFFFF;
+  --theme-border-radius: 0.125rem;
+}
+
+.theme-classic h1, .theme-classic h2, .theme-classic h3, 
+.theme-classic h4, .theme-classic h5, .theme-classic h6 {
+  font-weight: 700;
+}
+
+.theme-classic .portfolio-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
