@@ -93,8 +93,15 @@ export default function NewCaseStudy() {
     },
     onSuccess: (response: any) => {
       console.log("Create response:", response);
-      if (!response?.caseStudy?.id) {
-        throw new Error("No case study ID in success response");
+      const caseStudyId = response?.caseStudy?.id;
+      if (!caseStudyId) {
+        console.error("Invalid response:", response);
+        toast({
+          title: "Error",
+          description: "Failed to get case study ID from response",
+          variant: "destructive"
+        });
+        return;
       }
       toast({
         title: "Success", 
