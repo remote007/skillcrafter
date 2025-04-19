@@ -88,6 +88,15 @@ export default function NewCaseStudy() {
       return apiRequest("POST", "/api/portfolio", data);
     },
     onSuccess: (data) => {
+      if (!data?.caseStudy?.id) {
+        toast({
+          title: "Error",
+          description: "Case study created but no ID returned",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Success",
         description: "Case study created successfully",
