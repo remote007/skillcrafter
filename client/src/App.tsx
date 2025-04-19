@@ -28,8 +28,6 @@ function Router() {
     <Switch>
       {/* Public Routes */}
       <Route path="/auth" component={AuthPage} />
-      <Route path="/:username/:slug" component={CaseStudyView} />
-      <Route path="/:username" component={PublicPortfolio} />
       
       {/* Protected Dashboard Routes */}
       <ProtectedRoute path="/" component={Dashboard} />
@@ -41,6 +39,10 @@ function Router() {
       <ProtectedRoute path="/dashboard/analytics" component={AnalyticsDashboard} />
       <ProtectedRoute path="/dashboard/theme" component={ThemeSettings} />
       <ProtectedRoute path="/dashboard/profile" component={Profile} />
+      
+      {/* Public Portfolio Routes - keep these after dashboard routes to prevent conflicts */}
+      <Route path="/:username/:slug" component={CaseStudyView} />
+      <Route path="/:username" component={PublicPortfolio} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
