@@ -17,8 +17,12 @@ import type {
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { db, pool } from "./db";
+import { eq, and } from "drizzle-orm";
 
 const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   // User operations
@@ -70,6 +74,239 @@ export interface IStorage {
   sessionStore: session.SessionStore;
 }
 
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.SessionStore;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true 
+    });
+  }
+
+  // User Methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  // Case Study Methods
+  async getCaseStudy(id: number): Promise<CaseStudy | undefined> {
+    const [caseStudy] = await db.select().from(caseStudies).where(eq(caseStudies.id, id));
+    return caseStudy;
+  }
+  
+  async getCaseStudyBySlug(slug: string, username: string): Promise<CaseStudy | undefined> {
+    const user = await this.getUserByUsername(username);
+    if (!user) return undefined;
+    
+    const [caseStudy] = await db.select()
+      .from(caseStudies)
+      .where(
+        and(
+          eq(caseStudies.slug, slug),
+          eq(caseStudies.userId, user.id)
+        )
+      );
+    return caseStudy;
+  }
+
+  async getCaseStudiesByUserId(userId: number): Promise<CaseStudy[]> {
+    return db.select()
+      .from(caseStudies)
+      .where(eq(caseStudies.userId, userId));
+  }
+
+  async createCaseStudy(insertCaseStudy: InsertCaseStudy): Promise<CaseStudy> {
+    const [caseStudy] = await db
+      .insert(caseStudies)
+      .values(insertCaseStudy)
+      .returning();
+    return caseStudy;
+  }
+  
+  async updateCaseStudy(id: number, caseStudyData: Partial<InsertCaseStudy>): Promise<CaseStudy | undefined> {
+    const now = new Date();
+    const [updatedCaseStudy] = await db
+      .update(caseStudies)
+      .set({ ...caseStudyData, updatedAt: now })
+      .where(eq(caseStudies.id, id))
+      .returning();
+    return updatedCaseStudy;
+  }
+  
+  async deleteCaseStudy(id: number): Promise<boolean> {
+    const result = await db.delete(caseStudies).where(eq(caseStudies.id, id));
+    return result.count > 0;
+  }
+
+  // Media Methods
+  async getMedia(id: number): Promise<Media | undefined> {
+    const [mediaItem] = await db.select().from(media).where(eq(media.id, id));
+    return mediaItem;
+  }
+  
+  async getMediaByCaseStudyId(caseStudyId: number): Promise<Media[]> {
+    return db.select()
+      .from(media)
+      .where(eq(media.caseStudyId, caseStudyId));
+  }
+  
+  async getMediaByUserId(userId: number): Promise<Media[]> {
+    return db.select()
+      .from(media)
+      .where(eq(media.userId, userId));
+  }
+  
+  async createMedia(insertMedia: InsertMedia): Promise<Media> {
+    const [mediaItem] = await db
+      .insert(media)
+      .values(insertMedia)
+      .returning();
+    return mediaItem;
+  }
+  
+  async deleteMedia(id: number): Promise<boolean> {
+    const result = await db.delete(media).where(eq(media.id, id));
+    return result.count > 0;
+  }
+
+  // Timeline Methods
+  async getTimelineItemsByCaseStudyId(caseStudyId: number): Promise<TimelineItem[]> {
+    return db.select()
+      .from(timelineItems)
+      .where(eq(timelineItems.caseStudyId, caseStudyId))
+      .orderBy(timelineItems.order);
+  }
+  
+  async createTimelineItem(insertTimelineItem: InsertTimelineItem): Promise<TimelineItem> {
+    const [timelineItem] = await db
+      .insert(timelineItems)
+      .values(insertTimelineItem)
+      .returning();
+    return timelineItem;
+  }
+  
+  async updateTimelineItem(id: number, itemData: Partial<InsertTimelineItem>): Promise<TimelineItem | undefined> {
+    const [updatedItem] = await db
+      .update(timelineItems)
+      .set(itemData)
+      .where(eq(timelineItems.id, id))
+      .returning();
+    return updatedItem;
+  }
+  
+  async deleteTimelineItem(id: number): Promise<boolean> {
+    const result = await db.delete(timelineItems).where(eq(timelineItems.id, id));
+    return result.count > 0;
+  }
+
+  // Analytics Methods
+  async getAnalyticsByUserId(userId: number): Promise<Analytics[]> {
+    return db.select()
+      .from(analytics)
+      .where(eq(analytics.userId, userId));
+  }
+  
+  async getAnalyticsByCaseStudyId(caseStudyId: number): Promise<Analytics[]> {
+    return db.select()
+      .from(analytics)
+      .where(eq(analytics.caseStudyId, caseStudyId));
+  }
+  
+  async createAnalyticsEntry(insertAnalytics: InsertAnalytics): Promise<Analytics> {
+    const [analyticsEntry] = await db
+      .insert(analytics)
+      .values(insertAnalytics)
+      .returning();
+    return analyticsEntry;
+  }
+
+  // Testimonial Methods
+  async getTestimonialsByCaseStudyId(caseStudyId: number): Promise<Testimonial[]> {
+    return db.select()
+      .from(testimonials)
+      .where(eq(testimonials.caseStudyId, caseStudyId));
+  }
+  
+  async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
+    const [testimonial] = await db
+      .insert(testimonials)
+      .values(insertTestimonial)
+      .returning();
+    return testimonial;
+  }
+  
+  async updateTestimonial(id: number, testimonialData: Partial<InsertTestimonial>): Promise<Testimonial | undefined> {
+    const [updatedTestimonial] = await db
+      .update(testimonials)
+      .set(testimonialData)
+      .where(eq(testimonials.id, id))
+      .returning();
+    return updatedTestimonial;
+  }
+  
+  async deleteTestimonial(id: number): Promise<boolean> {
+    const result = await db.delete(testimonials).where(eq(testimonials.id, id));
+    return result.count > 0;
+  }
+
+  // Metrics Methods
+  async getMetricsByCaseStudyId(caseStudyId: number): Promise<Metric[]> {
+    return db.select()
+      .from(metrics)
+      .where(eq(metrics.caseStudyId, caseStudyId));
+  }
+  
+  async createMetric(insertMetric: InsertMetric): Promise<Metric> {
+    const [metric] = await db
+      .insert(metrics)
+      .values(insertMetric)
+      .returning();
+    return metric;
+  }
+  
+  async updateMetric(id: number, metricData: Partial<InsertMetric>): Promise<Metric | undefined> {
+    const [updatedMetric] = await db
+      .update(metrics)
+      .set(metricData)
+      .where(eq(metrics.id, id))
+      .returning();
+    return updatedMetric;
+  }
+  
+  async deleteMetric(id: number): Promise<boolean> {
+    const result = await db.delete(metrics).where(eq(metrics.id, id));
+    return result.count > 0;
+  }
+}
+
+// Keep the MemStorage for reference (commented out)
+/*
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private caseStudies: Map<number, CaseStudy>;
@@ -112,234 +349,8 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // User Methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
-  
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userId++;
-    const now = new Date();
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: now
-    };
-    this.users.set(id, user);
-    return user;
-  }
-  
-  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
-    const user = await this.getUser(id);
-    if (!user) return undefined;
-    
-    const updatedUser = { ...user, ...userData };
-    this.users.set(id, updatedUser);
-    return updatedUser;
-  }
-
-  // Case Study Methods
-  async getCaseStudy(id: number): Promise<CaseStudy | undefined> {
-    return this.caseStudies.get(id);
-  }
-  
-  async getCaseStudyBySlug(slug: string, username: string): Promise<CaseStudy | undefined> {
-    const user = await this.getUserByUsername(username);
-    if (!user) return undefined;
-    
-    return Array.from(this.caseStudies.values()).find(
-      cs => cs.slug === slug && cs.userId === user.id
-    );
-  }
-
-  async getCaseStudiesByUserId(userId: number): Promise<CaseStudy[]> {
-    return Array.from(this.caseStudies.values()).filter(
-      caseStudy => caseStudy.userId === userId
-    );
-  }
-
-  async createCaseStudy(insertCaseStudy: InsertCaseStudy): Promise<CaseStudy> {
-    const id = this.caseStudyId++;
-    const now = new Date();
-    const caseStudy: CaseStudy = { 
-      ...insertCaseStudy, 
-      id,
-      createdAt: now,
-      updatedAt: now
-    };
-    this.caseStudies.set(id, caseStudy);
-    return caseStudy;
-  }
-  
-  async updateCaseStudy(id: number, caseStudyData: Partial<InsertCaseStudy>): Promise<CaseStudy | undefined> {
-    const caseStudy = await this.getCaseStudy(id);
-    if (!caseStudy) return undefined;
-    
-    const now = new Date();
-    const updatedCaseStudy = { ...caseStudy, ...caseStudyData, updatedAt: now };
-    this.caseStudies.set(id, updatedCaseStudy);
-    return updatedCaseStudy;
-  }
-  
-  async deleteCaseStudy(id: number): Promise<boolean> {
-    return this.caseStudies.delete(id);
-  }
-
-  // Media Methods
-  async getMedia(id: number): Promise<Media | undefined> {
-    return this.mediaItems.get(id);
-  }
-  
-  async getMediaByCaseStudyId(caseStudyId: number): Promise<Media[]> {
-    return Array.from(this.mediaItems.values()).filter(
-      media => media.caseStudyId === caseStudyId
-    );
-  }
-  
-  async getMediaByUserId(userId: number): Promise<Media[]> {
-    return Array.from(this.mediaItems.values()).filter(
-      media => media.userId === userId
-    );
-  }
-  
-  async createMedia(insertMedia: InsertMedia): Promise<Media> {
-    const id = this.mediaId++;
-    const now = new Date();
-    const media: Media = { 
-      ...insertMedia, 
-      id,
-      createdAt: now
-    };
-    this.mediaItems.set(id, media);
-    return media;
-  }
-  
-  async deleteMedia(id: number): Promise<boolean> {
-    return this.mediaItems.delete(id);
-  }
-
-  // Timeline Methods
-  async getTimelineItemsByCaseStudyId(caseStudyId: number): Promise<TimelineItem[]> {
-    return Array.from(this.timelineItems.values())
-      .filter(item => item.caseStudyId === caseStudyId)
-      .sort((a, b) => a.order - b.order);
-  }
-  
-  async createTimelineItem(insertTimelineItem: InsertTimelineItem): Promise<TimelineItem> {
-    const id = this.timelineItemId++;
-    const timelineItem: TimelineItem = { 
-      ...insertTimelineItem, 
-      id
-    };
-    this.timelineItems.set(id, timelineItem);
-    return timelineItem;
-  }
-  
-  async updateTimelineItem(id: number, itemData: Partial<InsertTimelineItem>): Promise<TimelineItem | undefined> {
-    const timelineItem = this.timelineItems.get(id);
-    if (!timelineItem) return undefined;
-    
-    const updatedItem = { ...timelineItem, ...itemData };
-    this.timelineItems.set(id, updatedItem);
-    return updatedItem;
-  }
-  
-  async deleteTimelineItem(id: number): Promise<boolean> {
-    return this.timelineItems.delete(id);
-  }
-
-  // Analytics Methods
-  async getAnalyticsByUserId(userId: number): Promise<Analytics[]> {
-    return Array.from(this.analyticsEntries.values()).filter(
-      entry => entry.userId === userId
-    );
-  }
-  
-  async getAnalyticsByCaseStudyId(caseStudyId: number): Promise<Analytics[]> {
-    return Array.from(this.analyticsEntries.values()).filter(
-      entry => entry.caseStudyId === caseStudyId
-    );
-  }
-  
-  async createAnalyticsEntry(insertAnalytics: InsertAnalytics): Promise<Analytics> {
-    const id = this.analyticsId++;
-    const now = new Date();
-    const analyticsEntry: Analytics = { 
-      ...insertAnalytics, 
-      id,
-      visitDate: now
-    };
-    this.analyticsEntries.set(id, analyticsEntry);
-    return analyticsEntry;
-  }
-
-  // Testimonial Methods
-  async getTestimonialsByCaseStudyId(caseStudyId: number): Promise<Testimonial[]> {
-    return Array.from(this.testimonialItems.values()).filter(
-      testimonial => testimonial.caseStudyId === caseStudyId
-    );
-  }
-  
-  async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
-    const id = this.testimonialId++;
-    const testimonial: Testimonial = { 
-      ...insertTestimonial, 
-      id
-    };
-    this.testimonialItems.set(id, testimonial);
-    return testimonial;
-  }
-  
-  async updateTestimonial(id: number, testimonialData: Partial<InsertTestimonial>): Promise<Testimonial | undefined> {
-    const testimonial = this.testimonialItems.get(id);
-    if (!testimonial) return undefined;
-    
-    const updatedTestimonial = { ...testimonial, ...testimonialData };
-    this.testimonialItems.set(id, updatedTestimonial);
-    return updatedTestimonial;
-  }
-  
-  async deleteTestimonial(id: number): Promise<boolean> {
-    return this.testimonialItems.delete(id);
-  }
-
-  // Metrics Methods
-  async getMetricsByCaseStudyId(caseStudyId: number): Promise<Metric[]> {
-    return Array.from(this.metricItems.values()).filter(
-      metric => metric.caseStudyId === caseStudyId
-    );
-  }
-  
-  async createMetric(insertMetric: InsertMetric): Promise<Metric> {
-    const id = this.metricId++;
-    const metric: Metric = { 
-      ...insertMetric, 
-      id
-    };
-    this.metricItems.set(id, metric);
-    return metric;
-  }
-  
-  async updateMetric(id: number, metricData: Partial<InsertMetric>): Promise<Metric | undefined> {
-    const metric = this.metricItems.get(id);
-    if (!metric) return undefined;
-    
-    const updatedMetric = { ...metric, ...metricData };
-    this.metricItems.set(id, updatedMetric);
-    return updatedMetric;
-  }
-  
-  async deleteMetric(id: number): Promise<boolean> {
-    return this.metricItems.delete(id);
-  }
+  // All methods from MemStorage...
 }
+*/
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
