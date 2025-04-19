@@ -1,0 +1,117 @@
+You are a full-stack AI dev. Generate a complete project codebase in one go for a portfolio & case study generator called **ProjectShelf**, built using the **MERN stack** with the following structure, technologies, and features. The project should be modular, clean, and scalable. 
+
+✅ Strictly follow this folder/file structure and only implement the features described below.  
+✅ Use **MongoDB, Express, React, Node.js, Bootstrap**, and optionally **Python (Flask) for analytics**.  
+✅ Use **Cloudinary** for media uploads, **Docker** for containerization, and **Netlify + Glitch** for deployment.
+
+---
+
+### 📁 Folder Structure
+
+project-shelf/ ├── client/ # React + Bootstrap Frontend ├── server/ # Express + MongoDB Backend ├── python-service/ # Flask analytics microservice (optional) ├── .env ├── docker-compose.yml ├── README.md └── .gitignore
+
+markdown
+Copy
+Edit
+
+---
+
+### 🧩 Features to Implement
+
+#### 🌐 Routing
+- Public portfolios available at: `/{username}` (Visitor view)
+- Authenticated Creator dashboard at `/dashboard`
+
+#### 👤 User Roles
+- **Creator** (authenticated, can edit portfolio)
+- **Visitor** (public view only)
+
+#### 🔐 Authentication
+- JWT-based login/register
+- Auth context for frontend with session storage
+- Auth middleware for backend routes
+
+#### 🛠 Portfolio Builder (CRUD)
+Each Creator can:
+- Create/edit/delete modular **case studies** with:
+  - Project overview
+  - Media gallery (images/videos via Cloudinary)
+  - Timeline of process
+  - Tools/technologies used
+  - Outcomes (metrics/testimonials)
+
+#### 🎨 Theme Engine
+- Select from 2-3 predefined portfolio themes
+- Real-time preview in dashboard
+- Theme stored per user
+
+#### 📈 Analytics Dashboard
+- Track:
+  - Portfolio traffic
+  - Engagement (clicks, visits)
+  - Case-study-level interest
+- Python microservice optional (Flask), accessible via `/api/analytics`
+
+---
+
+### 🔧 Tech Stack
+
+- **Frontend:** React, Bootstrap, Axios, Context API
+- **Backend:** Node.js, Express, Mongoose
+- **DB:** MongoDB
+- **Auth:** JWT, bcrypt
+- **Media Upload:** Cloudinary via Multer
+- **Python (Optional):** Flask service for analytics
+- **Deployment:** Netlify (client), Glitch (backend)
+- **Dockerized** using `docker-compose.yml`
+
+---
+
+### 🔗 API Summary
+
+| Endpoint                     | Method | Purpose                     |
+|-----------------------------|--------|-----------------------------|
+| `/api/auth/register`        | POST   | Register new creator        |
+| `/api/auth/login`           | POST   | Login creator               |
+| `/api/portfolio/`           | GET    | Get creator's case studies  |
+| `/api/portfolio/:id`        | GET/PUT/DELETE | Case study actions |
+| `/api/media/upload`         | POST   | Upload media to Cloudinary |
+| `/api/analytics/:username`  | GET    | Get traffic stats           |
+| `/api/analytics/hit/:username` | POST | Register page visit        |
+
+---
+
+### 📁 Required Code Files (Generate All)
+
+#### Frontend (`client/`)
+- `components/`: Navbar, MediaGallery, PortfolioCard, ThemeSelector, Timeline, MetricsDisplay
+- `pages/`: Login, Register, Dashboard, NewCaseStudy, EditCaseStudy, CaseStudyView, PublicPortfolio
+- `services/`: `api.js`, `auth.js`
+- `context/`: `AuthContext.js`, `ThemeContext.js`
+- Main: `App.js`, `index.js`, `bootstrap.min.css`
+
+#### Backend (`server/`)
+- `controllers/`: authController, portfolioController, analyticsController, mediaController
+- `routes/`: authRoutes, portfolioRoutes, mediaRoutes, analyticsRoutes
+- `models/`: User, Portfolio, Analytics
+- `middleware/`: authMiddleware, errorHandler, upload
+- `utils/`: cloudinary.js, themeList.js
+- `config/`: db.js
+- Entry: `server.js`
+
+#### Python Analytics Service (`python-service/`)
+- `app.py` (Flask service)
+- `requirements.txt`
+- `Dockerfile`
+
+---
+
+### 📦 Docker
+- `docker-compose.yml` with 3 services:
+  - frontend (port 3000)
+  - backend (port 5000)
+  - analytics (port 8000)
+
+---
+
+✨ Output a clean, working codebase with this structure, file by file. Use best practices and ensure the app meets all requirements above — **no extra features** unless asked.
