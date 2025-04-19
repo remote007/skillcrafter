@@ -85,24 +85,10 @@ export default function NewCaseStudy() {
   // Create case study mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest("POST", "/api/portfolio", data);
-      if (!response?.caseStudy?.id) {
-        throw new Error("No case study ID returned from server");
-      }
-      return response;
+      return apiRequest("POST", "/api/portfolio", data);
     },
     onSuccess: (response: any) => {
       console.log("Create response:", response);
-      const caseStudyId = response?.caseStudy?.id;
-      if (!caseStudyId) {
-        console.error("Invalid response:", response);
-        toast({
-          title: "Error",
-          description: "Failed to get case study ID from response",
-          variant: "destructive"
-        });
-        return;
-      }
       toast({
         title: "Success", 
         description: "Case study created successfully",
