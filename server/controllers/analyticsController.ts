@@ -1,7 +1,7 @@
 import { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../middleware/auth";
-import { insertAnalyticsSchema } from "@shared/schema";
+import { insertAnalyticsSchema, User } from "@shared/schema";
 import { z } from "zod";
 
 export function registerAnalyticsRoutes(app: Express) {

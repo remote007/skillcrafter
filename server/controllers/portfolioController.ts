@@ -5,7 +5,8 @@ import {
   insertCaseStudySchema, 
   insertTimelineItemSchema,
   insertTestimonialSchema,
-  insertMetricSchema
+  insertMetricSchema,
+  User
 } from "@shared/schema";
 import { z } from "zod";
 
