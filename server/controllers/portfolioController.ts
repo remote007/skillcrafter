@@ -184,11 +184,18 @@ export function registerPortfolioRoutes(app: Express) {
       // Create the case study
       const newCaseStudy = await storage.createCaseStudy(caseStudyData);
       
-      if (!newCaseStudy || !newCaseStudy.id) {
-        return res.status(500).json({ message: "Failed to create case study" });
+      if (!newCaseStudy) {
+        return res.status(500).json({ message: "Failed to create case study - database error" });
+      }
+
+      if (!newCaseStudy.id) {
+        console.error("Created case study missing ID:", newCaseStudy);
+        return res.status(500).json({ message: "Failed to create case study - missing ID" });
       }
       
-      res.status(201).json({ caseStudy: newCaseStudy });
+      const response = { caseStudy: newCaseStudy };
+      console.log("Sending case study response:", response);
+      res.status(201).json(response);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
