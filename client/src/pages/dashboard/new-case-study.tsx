@@ -88,7 +88,7 @@ export default function NewCaseStudy() {
       return apiRequest("POST", "/api/portfolio", data);
     },
     onSuccess: (response: any) => {
-      navigate(`/dashboard/case-studies/${response.caseStudy.id}/edit`);
+      navigate(`/dashboard/case-studies/${response.id}/edit`);
       toast({
         title: "Success", 
         description: "Case study created successfully",
