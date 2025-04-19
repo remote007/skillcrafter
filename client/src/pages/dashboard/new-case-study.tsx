@@ -34,10 +34,10 @@ export default function NewCaseStudy() {
     tools: [] as string[],
     tags: [] as string[],
   });
-  
+
   const [newTool, setNewTool] = useState("");
   const [newTag, setNewTag] = useState("");
-  
+
   // Handle tools and tags
   const handleAddTool = () => {
     if (newTool.trim() && !caseStudyData.tools.includes(newTool.trim())) {
@@ -48,14 +48,14 @@ export default function NewCaseStudy() {
       setNewTool("");
     }
   };
-  
+
   const handleRemoveTool = (toolToRemove: string) => {
     setCaseStudyData({
       ...caseStudyData,
       tools: caseStudyData.tools.filter(tool => tool !== toolToRemove),
     });
   };
-  
+
   const handleAddTag = () => {
     if (newTag.trim() && !caseStudyData.tags.includes(newTag.trim())) {
       setCaseStudyData({
@@ -65,14 +65,14 @@ export default function NewCaseStudy() {
       setNewTag("");
     }
   };
-  
+
   const handleRemoveTag = (tagToRemove: string) => {
     setCaseStudyData({
       ...caseStudyData,
       tags: caseStudyData.tags.filter(tag => tag !== tagToRemove),
     });
   };
-  
+
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -81,28 +81,28 @@ export default function NewCaseStudy() {
       [name]: value,
     });
   };
-  
+
   // Create case study mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       return apiRequest("POST", "/api/portfolio", data);
     },
-    onSuccess: (data) => {
-      if (!data?.caseStudy?.id) {
+    onSuccess: (response: any) => {
+      console.log("Create response:", response);
+      if (!response?.caseStudy?.id) {
         toast({
           title: "Error",
-          description: "Case study created but no ID returned",
-          variant: "destructive",
+          description: "Failed to create case study - no ID returned",
+          variant: "destructive"
         });
         return;
       }
-      
       toast({
-        title: "Success",
+        title: "Success", 
         description: "Case study created successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
-      navigate(`/dashboard/case-studies/${data.caseStudy.id}/edit`);
+      navigate(`/dashboard/case-studies/${response.caseStudy.id}/edit`);
     },
     onError: (error) => {
       toast({
@@ -112,7 +112,7 @@ export default function NewCaseStudy() {
       });
     },
   });
-  
+
   // Handle form submission
   const handleSubmit = () => {
     if (!caseStudyData.title || !caseStudyData.summary) {
@@ -123,7 +123,7 @@ export default function NewCaseStudy() {
       });
       return;
     }
-    
+
     // Generate slug if empty
     let slug = caseStudyData.slug;
     if (!slug) {
@@ -132,7 +132,7 @@ export default function NewCaseStudy() {
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-');
     }
-    
+
     createMutation.mutate({
       ...caseStudyData,
       slug,
@@ -174,7 +174,7 @@ export default function NewCaseStudy() {
 
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h2 className="text-xl font-bold mb-6">Case Study Details</h2>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                   <div>
@@ -188,7 +188,7 @@ export default function NewCaseStudy() {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="summary">Summary</Label>
                     <Textarea
@@ -201,7 +201,7 @@ export default function NewCaseStudy() {
                       rows={3}
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="overview">Project Overview</Label>
                     <Textarea
@@ -215,11 +215,11 @@ export default function NewCaseStudy() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="border rounded-lg p-6">
                     <h3 className="text-lg font-medium mb-4">Settings</h3>
-                    
+
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="slug">URL Slug</Label>
@@ -240,7 +240,7 @@ export default function NewCaseStudy() {
                           Leave empty to auto-generate from title
                         </p>
                       </div>
-                      
+
                       <div>
                         <Label htmlFor="status">Status</Label>
                         <Select
@@ -258,7 +258,7 @@ export default function NewCaseStudy() {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div>
                         <Label htmlFor="coverImage">Cover Image URL</Label>
                         <Input
@@ -270,7 +270,7 @@ export default function NewCaseStudy() {
                           className="mt-1"
                         />
                       </div>
-                      
+
                       {caseStudyData.coverImage && (
                         <div className="mt-2">
                           <img
@@ -282,7 +282,7 @@ export default function NewCaseStudy() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="border rounded-lg p-6">
                     <h3 className="text-lg font-medium mb-4">Tools & Technologies</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -315,7 +315,7 @@ export default function NewCaseStudy() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="border rounded-lg p-6">
                     <h3 className="text-lg font-medium mb-4">Tags</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -350,7 +350,7 @@ export default function NewCaseStudy() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-8 border-t pt-6">
                 <p className="text-slate-500 mb-4">
                   After creating your case study, you'll be able to add timeline items, outcome metrics, testimonials, and media.
