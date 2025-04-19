@@ -184,6 +184,10 @@ export function registerPortfolioRoutes(app: Express) {
       // Create the case study
       const newCaseStudy = await storage.createCaseStudy(caseStudyData);
       
+      if (!newCaseStudy || !newCaseStudy.id) {
+        return res.status(500).json({ message: "Failed to create case study" });
+      }
+      
       res.status(201).json({ caseStudy: newCaseStudy });
     } catch (error) {
       if (error instanceof z.ZodError) {
