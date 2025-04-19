@@ -193,9 +193,7 @@ export function registerPortfolioRoutes(app: Express) {
         return res.status(500).json({ message: "Failed to create case study - missing ID" });
       }
       
-      const response = { caseStudy: newCaseStudy };
-      console.log("Sending case study response:", response);
-      res.status(201).json(response);
+      res.status(201).json({ caseStudy: { id: newCaseStudy.id, ...newCaseStudy } });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 

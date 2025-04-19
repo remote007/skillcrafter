@@ -88,7 +88,7 @@ export default function NewCaseStudy() {
       return apiRequest("POST", "/api/portfolio", data);
     },
     onSuccess: (response: any) => {
-      console.log("Create response:", response);
+      navigate(`/dashboard/case-studies/${response.caseStudy.id}/edit`);
       toast({
         title: "Success", 
         description: "Case study created successfully",
