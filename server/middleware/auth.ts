@@ -10,7 +10,19 @@ import jwt from "jsonwebtoken";
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    // Extend the User interface to include all properties from the schema User type
+    interface User {
+      id: number;
+      username: string;
+      password: string;
+      email: string;
+      name: string;
+      bio?: string | null;
+      profileImage?: string | null;
+      createdAt?: Date;
+      theme?: string;
+      socialLinks?: any;
+    }
   }
 }
 
