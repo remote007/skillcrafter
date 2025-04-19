@@ -14,6 +14,12 @@ export function registerPortfolioRoutes(app: Express) {
   app.get("/api/portfolio/:identifier", async (req: Request, res: Response) => {
     try {
       const { identifier } = req.params;
+      
+      // Special handling to avoid conflicts with auth routes
+      if (identifier === 'auth') {
+        return res.status(404).json({ message: "Invalid path" });
+      }
+      
       let userId: number;
       
       // Check if identifier is numeric (user ID) or a string (username)
@@ -106,6 +112,12 @@ export function registerPortfolioRoutes(app: Express) {
   app.get("/api/portfolio/:username/:slug", async (req: Request, res: Response) => {
     try {
       const { username, slug } = req.params;
+      
+      // Special handling to avoid conflicts with auth routes
+      if (username === 'auth') {
+        return res.status(404).json({ message: "Invalid path" });
+      }
+      
       const caseStudy = await storage.getCaseStudyBySlug(slug, username);
       
       if (!caseStudy) {

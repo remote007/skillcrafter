@@ -27,9 +27,8 @@ function Router() {
   return (
     <Switch>
       {/* Public Routes - Auth must come before any dynamic username routes */}
-      <Route path="/auth">
-        <AuthPage />
-      </Route>
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/auth/:tab" component={AuthPage} />
       
       {/* Protected Dashboard Routes */}
       <ProtectedRoute path="/" component={Dashboard} />

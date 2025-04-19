@@ -10,6 +10,11 @@ export function registerAnalyticsRoutes(app: Express) {
     try {
       const { username } = req.params;
       
+      // Special handling to avoid conflicts with auth routes
+      if (username === 'auth') {
+        return res.status(404).json({ message: "Invalid path" });
+      }
+      
       // Get user by username
       const user = await storage.getUserByUsername(username);
       if (!user) {
