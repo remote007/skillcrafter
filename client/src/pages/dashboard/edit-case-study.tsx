@@ -47,7 +47,7 @@ export default function EditCaseStudy() {
   });
   
   // Timeline Management
-  const [timelineItems, setTimelineItems] = useState<any[]>([]);
+  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([]);
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
   const [currentTimelineItem, setCurrentTimelineItem] = useState({
     id: 0,
@@ -822,7 +822,7 @@ export default function EditCaseStudy() {
                       </Button>
                     </div>
                     
-                    {timelineItems.length === 0 ? (
+                    {!timelineItems || timelineItems.length === 0 ? (
                       <div className="text-center p-12 border border-dashed rounded-md">
                         <Calendar className="h-12 w-12 mx-auto text-slate-400 mb-4" />
                         <h3 className="text-lg font-medium text-slate-800 mb-2">No Timeline Items</h3>
