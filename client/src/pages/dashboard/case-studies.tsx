@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -35,25 +36,21 @@ export default function CaseStudies() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [caseStudyToDelete, setCaseStudyToDelete] = useState<CaseStudy | null>(null);
+  const ITEMS_PER_PAGE = 9;
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch case studies
   const { data, isLoading, error } = useQuery({
     queryKey: ["/api/portfolio"],
     queryFn: async ({ queryKey }) => {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
       });
-      
-      if (!res.ok) {
-        throw new Error("Failed to fetch case studies");
-      }
-      
+      if (!res.ok) throw new Error("Failed to fetch case studies");
       return res.json();
     },
     enabled: !!user,
   });
 
-  // Delete case study mutation
   const deleteMutation = useMutation({
     mutationFn: async (caseStudyId: number) => {
       return apiRequest("DELETE", `/api/portfolio/${caseStudyId}`);
@@ -89,10 +86,6 @@ export default function CaseStudies() {
     setCaseStudyToDelete(null);
   };
 
-  // Filter and search case studies
-  const ITEMS_PER_PAGE = 9;
-  const [currentPage, setCurrentPage] = useState(1);
-  
   const filteredCaseStudies = data?.caseStudies
     ? data.caseStudies.filter((study: CaseStudy) => {
         const matchesSearch = searchTerm === "" || 
@@ -108,10 +101,8 @@ export default function CaseStudies() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
       <DashboardSidebar />
-
       <div className="flex-1 md:ml-64">
         <DashboardNavbar title="Case Studies" />
-
         <main className="p-6">
           <div className="max-w-7xl mx-auto">
             <div className="md:flex md:items-center md:justify-between mb-8">
@@ -132,7 +123,6 @@ export default function CaseStudies() {
               </div>
             </div>
 
-            {/* Filters */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4">
               <div className="relative rounded-md shadow-sm flex-1">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -151,7 +141,7 @@ export default function CaseStudies() {
                   value={statusFilter} 
                   onValueChange={setStatusFilter}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger>
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
@@ -164,7 +154,6 @@ export default function CaseStudies() {
               </div>
             </div>
 
-            {/* Case Studies Grid */}
             {isLoading ? (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -172,7 +161,10 @@ export default function CaseStudies() {
             ) : error ? (
               <div className="text-center py-12">
                 <p className="text-red-500">Error loading case studies</p>
-                <Button className="mt-4" onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] })}>
+                <Button 
+                  className="mt-4" 
+                  onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] })}
+                >
                   Try Again
                 </Button>
               </div>
@@ -182,15 +174,35 @@ export default function CaseStudies() {
                   {filteredCaseStudies
                     .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
                     .map((caseStudy: CaseStudy) => (
-                  <PortfolioCard
-                    key={caseStudy.id}
-                    caseStudy={caseStudy}
-                    username={user?.username || ""}
-                    isActionable={true}
-                    onEdit={() => window.location.href = `/dashboard/case-studies/${caseStudy.id}/edit`}
-                    onDelete={() => handleDeleteClick(caseStudy)}
-                  />
-                ))}
+                      <PortfolioCard
+                        key={caseStudy.id}
+                        caseStudy={caseStudy}
+                        username={user?.username || ""}
+                        isActionable={true}
+                        onEdit={() => window.location.href = `/dashboard/case-studies/${caseStudy.id}/edit`}
+                        onDelete={() => handleDeleteClick(caseStudy)}
+                      />
+                    ))}
+                </div>
+                {filteredCaseStudies.length > ITEMS_PER_PAGE && (
+                  <div className="flex justify-center mt-8">
+                    <div className="flex space-x-2">
+                      {Array.from({ length: Math.ceil(filteredCaseStudies.length / ITEMS_PER_PAGE) }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i + 1)}
+                          className={`px-4 py-2 text-sm rounded-md ${
+                            currentPage === i + 1
+                              ? 'bg-primary text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-12 bg-white rounded-lg shadow-sm">
@@ -225,7 +237,6 @@ export default function CaseStudies() {
         </main>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!caseStudyToDelete} onOpenChange={cancelDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -237,28 +248,6 @@ export default function CaseStudies() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                </div>
-                {filteredCaseStudies.length > ITEMS_PER_PAGE && (
-                  <div className="flex justify-center mt-8">
-                    <div className="flex space-x-2">
-                      {Array.from({ length: Math.ceil(filteredCaseStudies.length / ITEMS_PER_PAGE) }).map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i + 1)}
-                          className={`px-4 py-2 text-sm rounded-md ${
-                            currentPage === i + 1
-                              ? 'bg-primary text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
             <AlertDialogAction 
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
