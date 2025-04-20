@@ -461,7 +461,6 @@ export default function AnalyticsDashboard() {
                           </div>
                         </div>
                       </CardContent>
-                    </Card>
 
                     <Card>
                       <CardHeader>
