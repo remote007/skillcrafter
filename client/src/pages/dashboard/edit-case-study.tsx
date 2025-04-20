@@ -45,7 +45,7 @@ export default function EditCaseStudy() {
     tools: [] as string[],
     tags: [] as string[],
   });
-  
+
   // Timeline Management
   const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([]);
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false);
@@ -57,7 +57,7 @@ export default function EditCaseStudy() {
     order: 0,
     isEditing: false,
   });
-  
+
   // Testimonials Management
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [testimonialDialogOpen, setTestimonialDialogOpen] = useState(false);
@@ -68,7 +68,7 @@ export default function EditCaseStudy() {
     position: "",
     isEditing: false,
   });
-  
+
   // Metrics Management
   const [metrics, setMetrics] = useState<any[]>([]);
   const [metricDialogOpen, setMetricDialogOpen] = useState(false);
@@ -80,12 +80,12 @@ export default function EditCaseStudy() {
     icon: "",
     isEditing: false,
   });
-  
+
   // Media Management
   const [mediaItems, setMediaItems] = useState<any[]>([]);
   const [newTool, setNewTool] = useState("");
   const [newTag, setNewTag] = useState("");
-  
+
   // Tools and Tags Input
   const handleAddTool = () => {
     if (newTool.trim() && !caseStudyData.tools.includes(newTool.trim())) {
@@ -96,14 +96,14 @@ export default function EditCaseStudy() {
       setNewTool("");
     }
   };
-  
+
   const handleRemoveTool = (toolToRemove: string) => {
     setCaseStudyData({
       ...caseStudyData,
       tools: caseStudyData.tools.filter(tool => tool !== toolToRemove),
     });
   };
-  
+
   const handleAddTag = () => {
     if (newTag.trim() && !caseStudyData.tags.includes(newTag.trim())) {
       setCaseStudyData({
@@ -113,16 +113,16 @@ export default function EditCaseStudy() {
       setNewTag("");
     }
   };
-  
+
   const handleRemoveTag = (tagToRemove: string) => {
     setCaseStudyData({
       ...caseStudyData,
       tags: caseStudyData.tags.filter(tag => tag !== tagToRemove),
     });
   };
-  
+
   const caseStudyId = params?.id ? parseInt(params.id, 10) : 0;
-  
+
   // Fetch case study data
   const { isLoading, error } = useQuery({
     queryKey: [`/api/portfolio/case-study/${caseStudyId}`],
@@ -130,13 +130,13 @@ export default function EditCaseStudy() {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
       });
-      
+
       if (!res.ok) {
         throw new Error("Failed to fetch case study");
       }
-      
+
       const data = await res.json();
-      
+
       // Set up case study data
       setCaseStudyData({
         title: data.caseStudy.title || "",
@@ -148,32 +148,32 @@ export default function EditCaseStudy() {
         tools: Array.isArray(data.caseStudy.tools) ? data.caseStudy.tools : [],
         tags: Array.isArray(data.caseStudy.tags) ? data.caseStudy.tags : [],
       });
-      
+
       // Set up timeline items
       if (data.timelineItems && data.timelineItems.length > 0) {
         setTimelineItems(data.timelineItems);
       }
-      
+
       // Set up testimonials
       if (data.testimonials && data.testimonials.length > 0) {
         setTestimonials(data.testimonials);
       }
-      
+
       // Set up metrics
       if (data.metrics && data.metrics.length > 0) {
         setMetrics(data.metrics);
       }
-      
+
       // Set up media
       if (data.mediaItems && data.mediaItems.length > 0) {
         setMediaItems(data.mediaItems);
       }
-      
+
       return data;
     },
     enabled: !!user && !!caseStudyId,
   });
-  
+
   // Fetch media for the case study
   const { data: mediaData } = useQuery({
     queryKey: [`/api/media/case-study/${caseStudyId}`],
@@ -181,23 +181,23 @@ export default function EditCaseStudy() {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
       });
-      
+
       if (!res.ok) {
         throw new Error("Failed to fetch media");
       }
-      
+
       return res.json();
     },
     enabled: !!user && !!caseStudyId,
   });
-  
+
   // Update media items when data is loaded
   useEffect(() => {
     if (mediaData && mediaData.media) {
       setMediaItems(mediaData.media);
     }
   }, [mediaData]);
-  
+
   // Update case study mutation
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -219,7 +219,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   // Timeline item mutations
   const addTimelineItemMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -242,7 +242,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   const updateTimelineItemMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
       return apiRequest("PUT", `/api/portfolio/timeline/${id}`, data);
@@ -266,7 +266,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   const deleteTimelineItemMutation = useMutation({
     mutationFn: async (id: number) => {
       return apiRequest("DELETE", `/api/portfolio/timeline/${id}?caseStudyId=${caseStudyId}`);
@@ -286,7 +286,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   // Testimonial mutations
   const addTestimonialMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -309,7 +309,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   // Metric mutations
   const addMetricMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -332,7 +332,7 @@ export default function EditCaseStudy() {
       });
     },
   });
-  
+
   // Handle form changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -341,7 +341,7 @@ export default function EditCaseStudy() {
       [name]: value,
     });
   };
-  
+
   // Handle timeline form
   const clearTimelineForm = () => {
     setCurrentTimelineItem({
@@ -353,7 +353,7 @@ export default function EditCaseStudy() {
       isEditing: false,
     });
   };
-  
+
   const openTimelineDialog = (item?: any) => {
     if (item) {
       setCurrentTimelineItem({
@@ -365,7 +365,7 @@ export default function EditCaseStudy() {
     }
     setTimelineDialogOpen(true);
   };
-  
+
   const handleTimelineFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentTimelineItem({
@@ -373,7 +373,7 @@ export default function EditCaseStudy() {
       [name]: value,
     });
   };
-  
+
   const submitTimelineForm = () => {
     if (!currentTimelineItem.title || !currentTimelineItem.date) {
       toast({
@@ -383,16 +383,16 @@ export default function EditCaseStudy() {
       });
       return;
     }
-    
+
     const { isEditing, ...data } = currentTimelineItem;
-    
+
     if (isEditing) {
       updateTimelineItemMutation.mutate({ id: data.id, data: { ...data, caseStudyId } });
     } else {
       addTimelineItemMutation.mutate({ ...data, caseStudyId });
     }
   };
-  
+
   // Handle testimonial form
   const clearTestimonialForm = () => {
     setCurrentTestimonial({
@@ -403,7 +403,7 @@ export default function EditCaseStudy() {
       isEditing: false,
     });
   };
-  
+
   const openTestimonialDialog = (item?: any) => {
     if (item) {
       setCurrentTestimonial({
@@ -415,7 +415,7 @@ export default function EditCaseStudy() {
     }
     setTestimonialDialogOpen(true);
   };
-  
+
   const handleTestimonialFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentTestimonial({
@@ -423,7 +423,7 @@ export default function EditCaseStudy() {
       [name]: value,
     });
   };
-  
+
   const submitTestimonialForm = () => {
     if (!currentTestimonial.text || !currentTestimonial.author) {
       toast({
@@ -433,9 +433,9 @@ export default function EditCaseStudy() {
       });
       return;
     }
-    
+
     const { isEditing, ...data } = currentTestimonial;
-    
+
     if (isEditing) {
       // Implement update later
       toast({
@@ -446,7 +446,7 @@ export default function EditCaseStudy() {
       addTestimonialMutation.mutate({ ...data, caseStudyId });
     }
   };
-  
+
   // Handle metric form
   const clearMetricForm = () => {
     setCurrentMetric({
@@ -458,7 +458,7 @@ export default function EditCaseStudy() {
       isEditing: false,
     });
   };
-  
+
   const openMetricDialog = (item?: any) => {
     if (item) {
       setCurrentMetric({
@@ -470,7 +470,7 @@ export default function EditCaseStudy() {
     }
     setMetricDialogOpen(true);
   };
-  
+
   const handleMetricFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentMetric({
@@ -478,7 +478,7 @@ export default function EditCaseStudy() {
       [name]: value,
     });
   };
-  
+
   const submitMetricForm = () => {
     if (!currentMetric.title || !currentMetric.value) {
       toast({
@@ -488,9 +488,9 @@ export default function EditCaseStudy() {
       });
       return;
     }
-    
+
     const { isEditing, ...data } = currentMetric;
-    
+
     if (isEditing) {
       // Implement update later
       toast({
@@ -501,7 +501,7 @@ export default function EditCaseStudy() {
       addMetricMutation.mutate({ ...data, caseStudyId });
     }
   };
-  
+
   // Handle case study update
   const handleUpdate = () => {
     if (!caseStudyData.title || !caseStudyData.summary) {
@@ -512,7 +512,7 @@ export default function EditCaseStudy() {
       });
       return;
     }
-    
+
     // Generate slug if empty
     let slug = caseStudyData.slug;
     if (!slug) {
@@ -521,13 +521,13 @@ export default function EditCaseStudy() {
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-');
     }
-    
+
     updateMutation.mutate({
       ...caseStudyData,
       slug,
     });
   };
-  
+
   // Handle preview click
   const handlePreview = () => {
     if (user && caseStudyData.slug) {
@@ -627,7 +627,7 @@ export default function EditCaseStudy() {
                       Media
                     </TabsTrigger>
                   </TabsList>
-                  
+
                   {/* Overview Tab */}
                   <TabsContent value="overview" className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -643,7 +643,7 @@ export default function EditCaseStudy() {
                             className="mt-1"
                           />
                         </div>
-                        
+
                         <div>
                           <Label htmlFor="summary">Summary</Label>
                           <Textarea
@@ -656,7 +656,7 @@ export default function EditCaseStudy() {
                             rows={3}
                           />
                         </div>
-                        
+
                         <div>
                           <Label htmlFor="overview">Project Overview</Label>
                           <Textarea
@@ -670,12 +670,12 @@ export default function EditCaseStudy() {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-6">
                         <Card>
                           <CardContent className="p-6">
                             <h3 className="text-lg font-medium mb-4">Settings</h3>
-                            
+
                             <div className="space-y-4">
                               <div>
                                 <Label htmlFor="slug">URL Slug</Label>
@@ -693,7 +693,7 @@ export default function EditCaseStudy() {
                                   />
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <Label htmlFor="status">Status</Label>
                                 <Select
@@ -711,7 +711,7 @@ export default function EditCaseStudy() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              
+
                               <div>
                                 <Label htmlFor="coverImage">Cover Image URL</Label>
                                 <Input
@@ -726,7 +726,7 @@ export default function EditCaseStudy() {
                                   Upload images in the Media tab
                                 </p>
                               </div>
-                              
+
                               {caseStudyData.coverImage && (
                                 <div className="mt-2">
                                   <img
@@ -739,7 +739,7 @@ export default function EditCaseStudy() {
                             </div>
                           </CardContent>
                         </Card>
-                        
+
                         <Card>
                           <CardContent className="p-6">
                             <h3 className="text-lg font-medium mb-4">Tools & Technologies</h3>
@@ -774,7 +774,7 @@ export default function EditCaseStudy() {
                             </div>
                           </CardContent>
                         </Card>
-                        
+
                         <Card>
                           <CardContent className="p-6">
                             <h3 className="text-lg font-medium mb-4">Tags</h3>
@@ -812,7 +812,7 @@ export default function EditCaseStudy() {
                       </div>
                     </div>
                   </TabsContent>
-                  
+
                   {/* Timeline Tab */}
                   <TabsContent value="timeline" className="p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -821,7 +821,7 @@ export default function EditCaseStudy() {
                         <Plus className="mr-2 h-4 w-4" /> Add Timeline Item
                       </Button>
                     </div>
-                    
+
                     {!timelineItems || timelineItems.length === 0 ? (
                       <div className="text-center p-12 border border-dashed rounded-md">
                         <Calendar className="h-12 w-12 mx-auto text-slate-400 mb-4" />
@@ -876,7 +876,7 @@ export default function EditCaseStudy() {
                       </div>
                     )}
                   </TabsContent>
-                  
+
                   {/* Outcomes Tab */}
                   <TabsContent value="outcomes" className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -888,7 +888,7 @@ export default function EditCaseStudy() {
                             <Plus className="mr-2 h-4 w-4" /> Add Metric
                           </Button>
                         </div>
-                        
+
                         <Card>
                           <CardContent className="p-6">
                             {metrics.length === 0 ? (
@@ -903,7 +903,7 @@ export default function EditCaseStudy() {
                                 {metrics.map((metric) => (
                                   <li key={metric.id} className="flex items-center group">
                                     <div className="bg-green-100 rounded-full p-2 mr-3">
-                                      <i className={metric.icon || "fas fa-chart-line"} />
+                                      <i className={`${metric?.icon || 'fas fa-chart-line'}`} />
                                     </div>
                                     <div className="flex-1">
                                       <span className="block text-slate-800 font-semibold">{metric.value}</span>
@@ -925,7 +925,7 @@ export default function EditCaseStudy() {
                           </CardContent>
                         </Card>
                       </div>
-                      
+
                       {/* Testimonials Section */}
                       <div>
                         <div className="flex justify-between items-center mb-6">
@@ -934,7 +934,7 @@ export default function EditCaseStudy() {
                             <Plus className="mr-2 h-4 w-4" /> Add Testimonial
                           </Button>
                         </div>
-                        
+
                         <Card>
                           <CardContent className="p-6">
                             {testimonials.length === 0 ? (
@@ -966,8 +966,7 @@ export default function EditCaseStudy() {
                                     <p className="text-sm font-medium text-slate-700">
                                       — {testimonial.author}
                                       {testimonial.position && `, ${testimonial.position}`}
-                                    </p>
-                                  </div>
+                                    </p>                                  </div>
                                 ))}
                               </div>
                             )}
@@ -976,7 +975,7 @@ export default function EditCaseStudy() {
                       </div>
                     </div>
                   </TabsContent>
-                  
+
                   {/* Media Tab */}
                   <TabsContent value="media" className="p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -985,11 +984,11 @@ export default function EditCaseStudy() {
                         <Plus className="mr-2 h-4 w-4" /> Upload Media
                       </Button>
                     </div>
-                    
+
                     <p className="mb-6 text-slate-500">
                       Coming soon: Media upload and management. For now, please use the Cover Image URL field in the Overview tab.
                     </p>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {mediaItems.map((media) => (
                         <div key={media.id} className="border rounded-md overflow-hidden">
@@ -1040,7 +1039,7 @@ export default function EditCaseStudy() {
           </div>
         </main>
       </div>
-      
+
       {/* Timeline Item Dialog */}
       <Dialog open={timelineDialogOpen} onOpenChange={setTimelineDialogOpen}>
         <DialogContent>
@@ -1113,7 +1112,7 @@ export default function EditCaseStudy() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Testimonial Dialog */}
       <Dialog open={testimonialDialogOpen} onOpenChange={setTestimonialDialogOpen}>
         <DialogContent>
@@ -1175,7 +1174,7 @@ export default function EditCaseStudy() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Metric Dialog */}
       <Dialog open={metricDialogOpen} onOpenChange={setMetricDialogOpen}>
         <DialogContent>
