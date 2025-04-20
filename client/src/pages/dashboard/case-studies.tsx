@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, Label } from "@/components/ui/card"; // Assumed components
 import PortfolioCard from "@/components/portfolio/PortfolioCard";
 import { useToast } from "@/hooks/use-toast";
 import { CaseStudy } from "@shared/schema";
@@ -91,9 +91,9 @@ export default function CaseStudies() {
         const matchesSearch = searchTerm === "" || 
           study.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           study.summary.toLowerCase().includes(searchTerm.toLowerCase());
-        
+
         const matchesStatus = statusFilter === "all" || study.status === statusFilter;
-        
+
         return matchesSearch && matchesStatus;
       })
     : [];
@@ -268,3 +268,61 @@ export default function CaseStudies() {
     </div>
   );
 }
+
+// Assumed PortfolioCard component structure.  Replace with your actual component if different.
+const PortfolioCard = ({ caseStudy, username, isActionable, onEdit, onDelete }) => {
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async (value) => {
+      setIsUpdating(true);
+      await apiRequest("PUT", `/api/portfolio/${caseStudy.id}`, { status: value });
+      setIsUpdating(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
+      toast({
+        title: "Status updated",
+        description: "Case study status has been updated successfully",
+      });
+    },
+    onError: (error) => {
+      setIsUpdating(false);
+      toast({
+        title: "Error",
+        description: "Failed to update case study status",
+        variant: "destructive",
+      });
+    },
+  });
+
+
+  return (
+    <Card>
+      <CardContent>
+        {/* ... other PortfolioCard content ... */}
+        <div className="mt-4 space-y-4">
+          <div>
+            <Label htmlFor={`status-${caseStudy.id}`}>Status</Label>
+            <Select
+              value={caseStudy.status}
+              onValueChange={(value) => updateStatusMutation.mutate(value)}
+            >
+              <SelectTrigger id={`status-${caseStudy.id}`}>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Link href={`/${username}/${caseStudy.slug}`}>
+            <Button variant="link" className="px-0">
+              View Live
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
