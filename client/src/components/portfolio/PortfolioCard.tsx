@@ -10,6 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PortfolioCardProps {
   caseStudy: CaseStudy;
@@ -47,29 +57,44 @@ export default function PortfolioCard({
             </div>
           )}
           <div className="absolute top-2 right-2">
-  {isActionable ? (
-    <Select
-      value={status}
-      onValueChange={(value) => {
-        fetch(`/api/portfolio/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: value })
-        }).then(() => window.location.reload());
-      }}
-    >
-      <SelectTrigger className="h-7 w-24">
-        <SelectValue placeholder="Status" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="draft">Draft</SelectItem>
-        <SelectItem value="published">Published</SelectItem>
-      </SelectContent>
-    </Select>
-  ) : status === "draft" && (
-    <Badge variant="secondary">Draft</Badge>
-  )}
-</div>
+    {isActionable ? (
+      <Select
+        value={caseStudy.status}
+        onValueChange={(value) => {
+          fetch(`/api/portfolio/${caseStudy.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: value })
+          })
+          .then(response => response.json())
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ['/api/portfolio'] });
+            toast({
+              title: "Status updated",
+              description: "Case study status has been updated successfully"
+            });
+          })
+          .catch(() => {
+            toast({
+              title: "Error",
+              description: "Failed to update case study status",
+              variant: "destructive"
+            });
+          });
+        }}
+      >
+        <SelectTrigger className="h-7 w-24">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="draft">Draft</SelectItem>
+          <SelectItem value="published">Published</SelectItem>
+        </SelectContent>
+      </Select>
+    ) : caseStudy.status === "draft" && (
+      <Badge variant="secondary">Draft</Badge>
+    )}
+  </div>
         </div>
         <CardContent className="p-5">
           <h3 className="text-xl font-semibold mb-2 text-slate-800 group-hover:text-primary transition-colors duration-200">
