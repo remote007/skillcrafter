@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CaseStudy } from "@shared/schema";
+import { Image as ImageIcon } from "lucide-react";
 
 interface PortfolioCardProps {
   caseStudy: CaseStudy;
@@ -19,7 +20,7 @@ export default function PortfolioCard({
   onDelete
 }: PortfolioCardProps) {
   const { id, title, summary, coverImage, slug, tools = [], status } = caseStudy;
-  
+
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200">
       <Link href={`/${username}/${slug}`} className="block group h-full">
@@ -35,7 +36,7 @@ export default function PortfolioCard({
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-100 rounded-t-lg">
-              <span className="text-slate-400 text-sm">{title || 'No Cover Image'}</span>
+              <ImageIcon className="h-12 w-12 text-slate-400" />
             </div>
           )}
           {status === "draft" && (
@@ -49,7 +50,7 @@ export default function PortfolioCard({
             {title}
           </h3>
           <p className="text-slate-600 mb-3 line-clamp-2">{summary}</p>
-          
+
           {tools && tools.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {Array.isArray(tools) && tools.map((tool, index) => (
@@ -59,7 +60,7 @@ export default function PortfolioCard({
               ))}
             </div>
           )}
-          
+
           {isActionable && (
             <div className="mt-4 flex justify-end space-x-2">
               <button
