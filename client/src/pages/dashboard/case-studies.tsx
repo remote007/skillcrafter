@@ -9,23 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Loader2, FileText, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, Label } from "@/components/ui/card"; // Assumed components
 import PortfolioCard from "@/components/portfolio/PortfolioCard";
 import { useToast } from "@/hooks/use-toast";
 import { CaseStudy } from "@shared/schema";
@@ -35,7 +24,6 @@ export default function CaseStudies() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [caseStudyToDelete, setCaseStudyToDelete] = useState<CaseStudy | null>(null);
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -51,40 +39,6 @@ export default function CaseStudies() {
     enabled: !!user,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (caseStudyId: number) => {
-      return apiRequest("DELETE", `/api/portfolio/${caseStudyId}`);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Case study deleted",
-        description: "Your case study has been successfully deleted",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/portfolio"] });
-      setCaseStudyToDelete(null);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to delete case study: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleDeleteClick = (caseStudy: CaseStudy) => {
-    setCaseStudyToDelete(caseStudy);
-  };
-
-  const confirmDelete = () => {
-    if (caseStudyToDelete) {
-      deleteMutation.mutate(caseStudyToDelete.id);
-    }
-  };
-
-  const cancelDelete = () => {
-    setCaseStudyToDelete(null);
-  };
 
   const filteredCaseStudies = data?.caseStudies
     ? data.caseStudies.filter((study: CaseStudy) => {
@@ -236,40 +190,10 @@ export default function CaseStudies() {
           </div>
         </main>
       </div>
-
-      <AlertDialog open={!!caseStudyToDelete} onOpenChange={cancelDelete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the case study "{caseStudyToDelete?.title}". 
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
 
-// Assumed PortfolioCard component structure.  Replace with your actual component if different.
 const PortfolioCard = ({ caseStudy, username, isActionable, onEdit, onDelete }) => {
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
