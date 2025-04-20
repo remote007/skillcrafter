@@ -21,19 +21,19 @@ const themes = [
     id: "minimal" as ThemeType,
     name: "Minimal",
     description: "Clean, simple design with focus on your work",
-    previewImage: "https://res.cloudinary.com/demo/image/upload/minimal-theme-preview.jpg",
+    previewImage: "https://placehold.co/600x400/f8fafc/334155?text=Minimal+Theme",
   },
   {
     id: "bold" as ThemeType,
     name: "Bold",
     description: "Vibrant colors and modern layout for a strong impression",
-    previewImage: "https://res.cloudinary.com/demo/image/upload/bold-theme-preview.jpg",
+    previewImage: "https://placehold.co/600x400/0f172a/f8fafc?text=Bold+Theme",
   },
   {
     id: "classic" as ThemeType,
     name: "Classic",
     description: "Timeless design with elegant typography",
-    previewImage: "https://res.cloudinary.com/demo/image/upload/classic-theme-preview.jpg",
+    previewImage: "https://placehold.co/600x400/fafaf9/1c1917?text=Classic+Theme",
   },
 ];
 
