@@ -90,6 +90,9 @@ export default function CaseStudies() {
   };
 
   // Filter and search case studies
+  const ITEMS_PER_PAGE = 9;
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const filteredCaseStudies = data?.caseStudies
     ? data.caseStudies.filter((study: CaseStudy) => {
         const matchesSearch = searchTerm === "" || 
@@ -174,8 +177,11 @@ export default function CaseStudies() {
                 </Button>
               </div>
             ) : filteredCaseStudies.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCaseStudies.map((caseStudy: CaseStudy) => (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredCaseStudies
+                    .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                    .map((caseStudy: CaseStudy) => (
                   <PortfolioCard
                     key={caseStudy.id}
                     caseStudy={caseStudy}
@@ -231,6 +237,28 @@ export default function CaseStudies() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                </div>
+                {filteredCaseStudies.length > ITEMS_PER_PAGE && (
+                  <div className="flex justify-center mt-8">
+                    <div className="flex space-x-2">
+                      {Array.from({ length: Math.ceil(filteredCaseStudies.length / ITEMS_PER_PAGE) }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i + 1)}
+                          className={`px-4 py-2 text-sm rounded-md ${
+                            currentPage === i + 1
+                              ? 'bg-primary text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
             <AlertDialogAction 
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"

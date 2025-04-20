@@ -171,7 +171,11 @@ export default function PublicPortfolio() {
             </div>
           ) : (
             <div className="text-center p-12 bg-white rounded-lg shadow">
-              <p className="text-slate-600">No case studies available yet.</p>
+              <div className="mb-4">
+                <FileText className="h-12 w-12 text-slate-300 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-slate-800 mb-2">No Case Studies Yet</h3>
+              <p className="text-slate-600">This portfolio is still being built. Check back soon for amazing case studies!</p>
             </div>
           )}
         </div>

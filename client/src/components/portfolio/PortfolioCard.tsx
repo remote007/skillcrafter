@@ -22,13 +22,22 @@ export default function PortfolioCard({
   
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200">
-      <Link href={`/${username}/${slug}`} className="block group">
-        <div className="relative pb-[60%]">
-          <img
-            src={coverImage || "https://via.placeholder.com/800x500?text=No+Cover+Image"}
-            alt={title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+      <Link href={`/${username}/${slug}`} className="block group h-full">
+        <div className="relative pb-[60%] bg-slate-100">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt={title}
+              className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+              onError={(e) => {
+                e.currentTarget.src = `https://placehold.co/800x500/f1f5f9/64748b?text=${encodeURIComponent(title)}`;
+              }}
+            />
+          ) : (
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-100 rounded-t-lg">
+              <span className="text-slate-400 text-sm">{title || 'No Cover Image'}</span>
+            </div>
+          )}
           {status === "draft" && (
             <div className="absolute top-2 right-2">
               <Badge variant="secondary">Draft</Badge>

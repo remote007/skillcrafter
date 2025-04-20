@@ -405,11 +405,40 @@ export default function AnalyticsDashboard() {
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : caseStudyAnalytics ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <Card className="md:col-span-2 xl:col-span-3">
+                      <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>{caseStudyAnalytics.caseStudy.title}</CardTitle>
+                        <div className="flex items-center space-x-4">
+                          <select 
+                            className="text-sm border rounded-md p-1"
+                            onChange={(e) => setTimeRange(e.target.value)}
+                          >
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                          </select>
+                        </div>
                       </CardHeader>
+                      <CardContent>
+                        <div className="h-[300px]">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={caseStudyAnalytics.visitsChart}>
+                              <defs>
+                                <linearGradient id="visitGradient" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
+                                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                </linearGradient>
+                              </defs>
+                              <XAxis dataKey="date" />
+                              <YAxis />
+                              <Tooltip />
+                              <Area type="monotone" dataKey="visits" stroke="#6366f1" fill="url(#visitGradient)" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
                       <CardContent>
                         <div className="mb-4">
                           <h3 className="text-lg font-medium">Overview</h3>
