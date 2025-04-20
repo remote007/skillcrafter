@@ -29,7 +29,7 @@ export default function AnalyticsDashboard() {
   const { user } = useAuth();
   const [timeRange, setTimeRange] = useState("30days");
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<string | null>(null);
-  
+
   // Fetch analytics data
   const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery({
     queryKey: ["/api/analytics"],
@@ -37,16 +37,16 @@ export default function AnalyticsDashboard() {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
       });
-      
+
       if (!res.ok) {
         throw new Error("Failed to fetch analytics data");
       }
-      
+
       return res.json();
     },
     enabled: !!user,
   });
-  
+
   // Fetch case study analytics if one is selected
   const { data: caseStudyAnalytics, isLoading: isLoadingCaseStudyAnalytics } = useQuery({
     queryKey: [`/api/analytics/case-study/${selectedCaseStudy}`],
@@ -54,25 +54,25 @@ export default function AnalyticsDashboard() {
       const res = await fetch(queryKey[0] as string, {
         credentials: "include",
       });
-      
+
       if (!res.ok) {
         throw new Error("Failed to fetch case study analytics");
       }
-      
+
       return res.json();
     },
     enabled: !!user && !!selectedCaseStudy,
   });
-  
+
   // Color palette for charts
   const COLORS = ['#4F46E5', '#0EA5E9', '#F97316', '#EF4444', '#10B981', '#6D28D9'];
-  
+
   // Calculate percent change
   const calculatePercentChange = (current: number, previous: number) => {
     if (previous === 0) return 100;
     return Math.round(((current - previous) / previous) * 100);
   };
-  
+
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -81,26 +81,26 @@ export default function AnalyticsDashboard() {
       day: 'numeric'
     }).format(date);
   };
-  
+
   // Get trend data
   const getTrendData = () => {
     if (!analyticsData || !analyticsData.visitsChartData) return {};
-    
+
     const recentVisits = analyticsData.recentVisits || 0;
-    
+
     // For simplicity, let's assume a 10% increase as a placeholder
     // In a real app, you would compare current period to previous period
     const previousPeriodVisits = Math.round(recentVisits * 0.9);
     const percentChange = calculatePercentChange(recentVisits, previousPeriodVisits);
     const isPositive = percentChange >= 0;
-    
+
     return {
       recentVisits,
       percentChange,
       isPositive
     };
   };
-  
+
   const trendData = getTrendData();
 
   return (
@@ -121,7 +121,7 @@ export default function AnalyticsDashboard() {
                   Track your portfolio performance and engagement
                 </p>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <Select
                   value={timeRange}
@@ -137,10 +137,10 @@ export default function AnalyticsDashboard() {
                     <SelectItem value="year">Last year</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Select
-                  value={selectedCaseStudy || ""}
-                  onValueChange={(value) => setSelectedCaseStudy(value || null)}
+                  value={selectedCaseStudy || "all"}
+                  onValueChange={(value) => setSelectedCaseStudy(value === "all" ? null : value)}
                 >
                   <SelectTrigger className="w-[220px]">
                     <SelectValue placeholder="All case studies" />
@@ -156,7 +156,7 @@ export default function AnalyticsDashboard() {
                 </Select>
               </div>
             </div>
-            
+
             {/* Overview Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
@@ -196,7 +196,7 @@ export default function AnalyticsDashboard() {
                   )}
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start">
@@ -219,7 +219,7 @@ export default function AnalyticsDashboard() {
                   </p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start">
@@ -249,14 +249,14 @@ export default function AnalyticsDashboard() {
                 </CardContent>
               </Card>
             </div>
-            
+
             <Tabs defaultValue="overview" className="mb-8">
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="referrers">Referrers</TabsTrigger>
                 <TabsTrigger value="caseStudies">Case Studies</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="overview" className="mt-6">
                 <Card>
                   <CardHeader>
@@ -306,7 +306,7 @@ export default function AnalyticsDashboard() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="referrers" className="mt-6">
                 <Card>
                   <CardHeader>
@@ -352,7 +352,7 @@ export default function AnalyticsDashboard() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="caseStudies" className="mt-6">
                 <Card>
                   <CardHeader>
@@ -394,12 +394,12 @@ export default function AnalyticsDashboard() {
                 </Card>
               </TabsContent>
             </Tabs>
-            
+
             {/* Case Study Details Section */}
             {selectedCaseStudy && (
               <div className="mb-8">
                 <h2 className="text-xl font-bold mb-6">Case Study Details</h2>
-                
+
                 {isLoadingCaseStudyAnalytics ? (
                   <div className="h-72 w-full flex items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -462,7 +462,7 @@ export default function AnalyticsDashboard() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card>
                       <CardHeader>
                         <CardTitle>Visits Over Time</CardTitle>
