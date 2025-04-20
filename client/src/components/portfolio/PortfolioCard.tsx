@@ -39,11 +39,30 @@ export default function PortfolioCard({
               <ImageIcon className="h-12 w-12 text-slate-400" />
             </div>
           )}
-          {status === "draft" && (
-            <div className="absolute top-2 right-2">
-              <Badge variant="secondary">Draft</Badge>
-            </div>
-          )}
+          <div className="absolute top-2 right-2">
+  {isActionable ? (
+    <Select
+      value={status}
+      onValueChange={(value) => {
+        fetch(`/api/portfolio/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: value })
+        }).then(() => window.location.reload());
+      }}
+    >
+      <SelectTrigger className="h-7 w-24">
+        <SelectValue placeholder="Status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="draft">Draft</SelectItem>
+        <SelectItem value="published">Published</SelectItem>
+      </SelectContent>
+    </Select>
+  ) : status === "draft" && (
+    <Badge variant="secondary">Draft</Badge>
+  )}
+</div>
         </div>
         <CardContent className="p-5">
           <h3 className="text-xl font-semibold mb-2 text-slate-800 group-hover:text-primary transition-colors duration-200">
