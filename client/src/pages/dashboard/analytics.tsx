@@ -146,7 +146,7 @@ export default function AnalyticsDashboard() {
                     <SelectValue placeholder="All case studies" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All case studies</SelectItem>
+                    <SelectItem value="all">All case studies</SelectItem>
                     {analyticsData?.caseStudyChartData?.map((study: any) => (
                       <SelectItem key={study.id} value={study.id.toString()}>
                         {study.title}
