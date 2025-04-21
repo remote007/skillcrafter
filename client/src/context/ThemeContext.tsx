@@ -42,6 +42,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { user, updateProfileMutation } = useAuth();
   const [currentTheme, setCurrentTheme] = useState<ThemeType>("minimal");
+  const [previewTheme, setPreviewTheme] = useState<ThemeType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Set theme based on user preference when logged in
@@ -50,6 +51,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setCurrentTheme(user.theme as ThemeType);
     }
   }, [user]);
+
+  const handlePreviewTheme = (theme: ThemeType) => {
+    setPreviewTheme(theme);
+  };
 
   const setTheme = async (theme: ThemeType) => {
     if (!user) return;

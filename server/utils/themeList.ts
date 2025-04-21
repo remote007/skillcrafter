@@ -71,30 +71,34 @@ export const themes: Theme[] = [
     `
   },
   {
-    id: 'classic',
-    name: 'Classic',
-    description: 'Timeless design with elegant typography',
-    previewImage: 'https://res.cloudinary.com/demo/image/upload/classic-theme-preview.jpg',
+    id: 'vintage',
+    name: 'Vintage Newspaper',
+    description: 'Classic newspaper inspired design with elegant typography',
+    previewImage: 'https://placehold.co/600x400/f6ecd6/1e1e1e?text=Vintage+Theme',
     colors: {
-      primary: '#10B981',
-      secondary: '#064E3B',
-      accent: '#F59E0B',
-      background: '#FAFAF9',
-      text: '#1C1917',
-      cardBackground: '#FFFFFF',
-      headerBackground: '#FFFFFF',
+      primary: '#1e1e1e',
+      secondary: '#c8a46a',
+      accent: '#c8a46a',
+      background: '#f6ecd6',
+      text: '#1e1e1e',
+      cardBackground: '#f6ecd6',
+      headerBackground: '#f6ecd6',
     },
     typography: {
-      headingFont: 'Merriweather, serif',
-      bodyFont: 'Lora, serif',
+      headingFont: 'Cinzel, serif',
+      bodyFont: 'Inter, serif',
     },
-    borderRadius: '0.125rem',
+    borderRadius: '0.25rem',
     css: `
       h1, h2, h3, h4, h5, h6 {
         font-weight: 700;
+        letter-spacing: 0.075em;
       }
       .portfolio-card {
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #1e1e1e;
+      }
+      .timeline-item {
+        border-left: 2px solid #c8a46a;
       }
     `
   }
