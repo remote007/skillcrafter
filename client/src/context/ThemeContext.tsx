@@ -14,6 +14,8 @@ interface ThemeContextType {
     previewImage: string;
   }[];
   isLoading: boolean;
+  previewTheme: ThemeType | null;
+  handlePreviewTheme: (theme: ThemeType) => void;
 }
 
 const themes = [
@@ -77,6 +79,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setTheme,
         themesList: themes,
         isLoading,
+        previewTheme,
+        handlePreviewTheme,
       }}
     >
       {children}
